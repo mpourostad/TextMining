@@ -12,7 +12,7 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-public class ClusterVisualizer {
+public class visualization {
 
     public void visualize(List<Document> documents, int[] clusterAssignments) {
         // reduce dimensionality using PCA

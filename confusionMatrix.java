@@ -1,12 +1,12 @@
 import java.util.*;
 
-public class ClusteringEvaluation {
+public class confusionMatrix {
     private int[] predictedLabels;
     private int[] actualLabels;
     private int numClusters;
     private int numLabels;
     
-    public ClusteringEvaluation(int[] predictedLabels, int[] actualLabels, int numClusters, int numLabels) {
+    public confusionMatrix(int[] predictedLabels, int[] actualLabels, int numClusters, int numLabels) {
         this.predictedLabels = predictedLabels;
         this.actualLabels = actualLabels;
         this.numClusters = numClusters;

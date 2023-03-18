@@ -13,8 +13,14 @@ import java.util.*;public class TextMining{
 	    }
 
 		DocumentTermMatrix dtm = new DocumentTermMatrix(inputFiles);
-		double[] documentTermMatrix = dtm.getDocumentTermMatrix();
+		double[][] documentTermMatrix = dtm.getDocumentTermMatrix();
 		List<String> allTerms = dtm.getAllTerms();
+		kmeansClustering clustering = new kmeansClustering(documentTermMatrix, 3);
+		clustering.setCosineSimilarity(true);
+		int[] clusters = clustering.cluster();
+		for (int c: clusters){
+			System.out.println(c);
+		}
 		
 		// for (String s: allTerms){
 		// 	System.out.print(s + " ");

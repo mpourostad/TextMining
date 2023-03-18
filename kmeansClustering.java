@@ -1,6 +1,6 @@
 import java.util.Random;
 
-public class KMeansClustering {
+public class kmeansClustering {
     private double[][] data; // the data to be clustered
     private int k; // number of clusters
     private int[] assignments; // the cluster assignments for each data point
@@ -9,7 +9,7 @@ public class KMeansClustering {
     private int maxIterations = 1000; // maximum number of iterations
     private boolean cosineSimilarity = false; // use cosine similarity instead of Euclidean distance
 
-    public KMeansClustering(double[][] data, int k) {
+    public kmeansClustering(double[][] data, int k) {
         this.data = data;
         this.k = k;
         this.assignments = new int[data.length];
@@ -37,7 +37,7 @@ public class KMeansClustering {
                 int closest = -1;
                 double closestDistance = Double.MAX_VALUE;
                 for (int j = 0; j < k; j++) {
-                    double distance = cosineSimilarity ? SimilarityMethods.cosineSimilarity(data[i], centroids[j]) : SimilarityMethods.euclideanDistance(data[i], centroids[j]);
+                    double distance = cosineSimilarity ? similarityMethods.cosineSimilarity(data[i], centroids[j]) : similarityMethods.euclideanDistance(data[i], centroids[j]);
                     if (distance < closestDistance) {
                         closest = j;
                         closestDistance = distance;
@@ -71,7 +71,7 @@ public class KMeansClustering {
             // check for convergence
             double delta = 0;
             for (int i = 0; i < k; i++) {
-                delta += cosineSimilarity ? SimilarityMethods.cosineSimilarity(centroids[i], newCentroids[i]) : SimilarityMethods.euclideanDistance(centroids[i], newCentroids[i]);
+                delta += cosineSimilarity ? similarityMethods.cosineSimilarity(centroids[i], newCentroids[i]) : similarityMethods.euclideanDistance(centroids[i], newCentroids[i]);
             }
             if (delta < epsilon) {
                 converged = true;

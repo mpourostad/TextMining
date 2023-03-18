@@ -1,4 +1,4 @@
-public class SimilarityMethods {
+public class similarityMethods {
     public static double cosineSimilarity(double[] x, double[] y) {
         double dotProduct = 0;
         double normX = 0;

@@ -13,7 +13,8 @@ public class DataCleaning {
 	    StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
 
 	    // define stop words
-	    String[] stopWords = {"a", "an", "the", "and", "but", "or", "for", "nor", "on", "at", "to", "from", "by", "with", "in", "out", "up", "down", "over", "under", ".", ",", ";", ":", "!", "?", "\'", "\"", "(", ")"};
+	    // String[] stopWords = {"a", "an", "the", "and", "but", "or", "for", "nor", "on", "at", "to", "from", "by", "with", "in", "out", "up", "down", "over", "under", ".", ",", ";", ":", "!", "?", "\'", "\"", "(", ")"};
+	    String[] stopWords = stop_words("NLTK_stopwords");
 
 	    String[] inputFileName = {"./dataset_3/data/C1/", "./dataset_3/data/C4/", "./dataset_3/data/C7/"};
 	    String[] outputFileName = {"./dataset_3/data/C1_out/", "./dataset_3/data/C4_out/", "./dataset_3/data/C7_out/"};
@@ -98,6 +99,22 @@ public class DataCleaning {
 
     // print a message indicating success
     System.out.println("Data preprocessed");
+    }
+    public static String[] stop_words(String fileName) throws IOException{
+        String content = "";
+
+        BufferedReader br = new BufferedReader(new FileReader(fileName));
+        String line;
+        while ((line = br.readLine()) != null) {
+            content += line + " ";
+        }
+
+        // Split the input string using the new line character as the delimiter
+        String[] stopwords = content.split(" ");
+        // for (String s : stopwords){
+        // 	System.out.println(s);
+        // }
+        return stopwords;
     }
 
 }

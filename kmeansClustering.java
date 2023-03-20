@@ -6,7 +6,7 @@ public class kmeansClustering {
     private int[] assignments; // the cluster assignments for each data point
     private double[][] centroids; // the centroids of the clusters
     private double epsilon = 0.0001; // convergence threshold
-    private int maxIterations = 1000; // maximum number of iterations
+    private int maxIterations = 10000; // maximum number of iterations
     private boolean cosineSimilarity = false; // use cosine similarity instead of Euclidean distance
 
     public kmeansClustering(double[][] data, int k) {
@@ -25,6 +25,7 @@ public class kmeansClustering {
         Random random = new Random();
         for (int i = 0; i < k; i++) {
             int index = random.nextInt(data.length);
+            // int index = (8 * i) + 4;
             centroids[i] = data[index].clone();
         }
 
@@ -84,4 +85,4 @@ public class kmeansClustering {
 
         return assignments;
         }
-        }
+    }

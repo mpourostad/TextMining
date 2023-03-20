@@ -6,10 +6,10 @@ import Jama.Matrix;
 import Jama.*;
 public class TextMining{
 	public static void main(String[] args) throws Exception{
-		// DataCleaning dc = new DataCleaning();
+		DataCleaning dc = new DataCleaning();
 		List<File> inputFiles = new ArrayList<>();
 		String[] outputFileName = {"./dataset_3/data/C1_out/", "./dataset_3/data/C4_out/", "./dataset_3/data/C7_out/"};
-		String[] files_out = {"article01out.txt", "article02out.txt", "article03out.txt", "article04out.txt", "article05out.txt", "article06out.txt", "article07out.txt", "article08out.txt"};
+		String[] files_out = {"article01out1.txt", "article02out1.txt", "article03out1.txt", "article04out1.txt", "article05out1.txt", "article06out1.txt", "article07out1.txt", "article08out1.txt"};
 	    for (String i : outputFileName){
 	    	for (String j : files_out){
 	    		inputFiles.add(new File(i + j));
@@ -32,8 +32,8 @@ public class TextMining{
 		clustering.setCosineSimilarity(true);
 		int[] clusters = clustering.cluster();
 
-		// double[][] reduced = reduceToTwoDimensions(documentTermMatrix);
-		// printarray(reduced);
+		double[][] reduced = reduceToTwoDimensions(documentTermMatrix);
+		printarray(reduced);
 		// List<double[]> dataPoints = Arrays.stream(reduced)
         //                     .map(row -> row.clone())
         //                     .collect(Collectors.toList());
@@ -82,8 +82,8 @@ public class TextMining{
 			System.out.println(allTerms.get(keywords[i]));
 		}
 
-		// Visualization visualize = new Visualization();
-		// visualize.visualize(reduced, clusters);
+		Visualization visualize = new Visualization();
+		visualize.visualize(reduced, clusters);
 
 		// for (String s: allTerms){
 		// 	System.out.print(s + " ");

@@ -2,8 +2,17 @@
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
-import Jama.Matrix;
-import Jama.*;
+// import Jama.Matrix;
+// import Jama.*;
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.mllib.linalg.Matrix;
+import org.apache.spark.mllib.linalg.Vector;
+import org.apache.spark.mllib.linalg.Vectors;
+import org.apache.spark.mllib.linalg.distributed.RowMatrix;
+import org.apache.spark.mllib.*;
+import java.util.LinkedList;
 public class TextMining{
 	public static void main(String[] args) throws Exception{
 		DataCleaning dc = new DataCleaning();
@@ -32,8 +41,10 @@ public class TextMining{
 		clustering.setCosineSimilarity(true);
 		int[] clusters = clustering.cluster();
 
-		double[][] reduced = reduceToTwoDimensions(documentTermMatrix);
-		printarray(reduced);
+		// double[][] reduced = reduceToTwoDimensions(documentTermMatrix);
+		// printarray(reduced);
+		reduceToTwoDimensions(documentTermMatrix);
+
 		// List<double[]> dataPoints = Arrays.stream(reduced)
         //                     .map(row -> row.clone())
         //                     .collect(Collectors.toList());
@@ -82,8 +93,8 @@ public class TextMining{
 			System.out.println(allTerms.get(keywords[i]));
 		}
 
-		Visualization visualize = new Visualization();
-		visualize.visualize(reduced, clusters);
+		// Visualization visualize = new Visualization();
+		// visualize.visualize(reduced, clusters);
 
 		// for (String s: allTerms){
 		// 	System.out.print(s + " ");
@@ -150,29 +161,29 @@ public class TextMining{
 	//     double[][] result = X_pca.getArray();
 	//     return result;
 	// }
-	public static double[][] reduceToTwoDimensions(double[][] matrix) {
-	    int numRows = matrix.length;
-	    int numCols = matrix[0].length;
-	    Matrix X = new Matrix(matrix);
-	    // Matrix X_centered = X.minus(X.mean(0));
-	    Matrix cov = X.transpose().times(X).times(1.0 / (numCols - 1));
-	    EigenvalueDecomposition ed = cov.eig();
-	    Matrix eigenvectors = ed.getV();
-	    double[][] eigenvectors_ = eigenvectors.getArray();
-	    // System.out.println(eigenvectors_[0].length);
-	    double[] eigenvalues = ed.getRealEigenvalues();
-	    int[] argmax = getNMaxIndices(eigenvalues, 2);
-	    double[][] max_eigenVectors = new double[numCols][2];
-	    max_eigenVectors[numCols - 1][0] = eigenvectors_[numCols - 1][argmax[0]];
-	    max_eigenVectors[numCols - 1][1] = eigenvectors_[numCols - 1][argmax[1]];
-	    Matrix max_eigenVector_matrix = new Matrix(max_eigenVectors);
+	// public static double[][] reduceToTwoDimensions(double[][] matrix) {
+	//     int numRows = matrix.length;
+	//     int numCols = matrix[0].length;
+	//     Matrix X = new Matrix(matrix);
+	//     // Matrix X_centered = X.minus(X.mean(0));
+	//     Matrix cov = X.transpose().times(X).times(1.0 / (numCols - 1));
+	//     EigenvalueDecomposition ed = cov.eig();
+	//     Matrix eigenvectors = ed.getV();
+	//     double[][] eigenvectors_ = eigenvectors.getArray();
+	//     // System.out.println(eigenvectors_[0].length);
+	//     double[] eigenvalues = ed.getRealEigenvalues();
+	//     int[] argmax = getNMaxIndices(eigenvalues, 2);
+	//     double[][] max_eigenVectors = new double[numCols][2];
+	//     max_eigenVectors[numCols - 1][0] = eigenvectors_[numCols - 1][argmax[0]];
+	//     max_eigenVectors[numCols - 1][1] = eigenvectors_[numCols - 1][argmax[1]];
+	//     Matrix max_eigenVector_matrix = new Matrix(max_eigenVectors);
 
-	    // System.out.print(argmax[0]);
+	//     // System.out.print(argmax[0]);
 
-	    Matrix X_pca = X.times(max_eigenVector_matrix);
-	    double[][] result = X_pca.getArray();
-	    return result;
-	}
+	//     Matrix X_pca = X.times(max_eigenVector_matrix);
+	//     double[][] result = X_pca.getArray();
+	//     return result;
+	// }
 	public static int argmax(double[] arr){
 		double re = Double.MIN_VALUE;
         int arg = -1;
@@ -209,5 +220,28 @@ public class TextMining{
 			System.out.println();
 		}
 	}
+	// public static void reduceToTwoDimensions(double[][] data){
+	// 	SparkConf conf = new SparkConf().setAppName("PCAExample").setMaster("local");
+	// 	JavaSparkContext sc = new JavaSparkContext(conf);
+	// 	LinkedList<Vector> rowsList = new LinkedList<>();
+	// 	for (int i = 0; i < data.length; i++) {
+	// 	  Vector currentRow = Vectors.dense(data[i]);
+	// 	  rowsList.add(currentRow);
+	// 	}
+	// 	JavaRDD<Vector> rows = sc.parallelize(rowsList);
+
+	// 	// Create a RowMatrix from JavaRDD<Vector>.
+	// 	RowMatrix mat = new RowMatrix(rows.rdd());
+
+	// 	// Compute the top 2 principal components.
+	// 	Matrix pc = mat.computePrincipalComponents(2);
+	// 	RowMatrix projected = mat.multiply(pc);
+	// 	// PCA pca = new PCA(2); 
+	//     // PCAModel pcaModel = pca.fit(rows);
+	//     // Matrix matrix = pcaModel.pc();
+	//     System.out.println("+++++++++++++++++++++++++");
+	//     System.out.println(projected.numRows());
+	//     System.out.println("+++++++++++++++++++++++++");
+	// }
 }
 

@@ -1,6 +1,6 @@
+// This class was developed by Divyanshi Parashar
 public class similarityMethods {
     public static double cosineSimilarity(double[] x, double[] y) {
-        // System.out.println("Thiiiiiiis");
         double dotProduct = 0;
         double normX = 0;
         double normY = 0;
@@ -13,7 +13,6 @@ public class similarityMethods {
     }
 
     public static double euclideanDistance(double[] x, double[] y) {
-        // System.out.println("Thiiiiiiis");
         double distance = 0;
         for (int i = 0; i < x.length; i++) {
             double diff = x[i] - y[i];

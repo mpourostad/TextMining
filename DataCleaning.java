@@ -4,13 +4,23 @@ import edu.stanford.nlp.pipeline.*;
 import edu.stanford.nlp.ling.*;
 import edu.stanford.nlp.util.*;
 import edu.stanford.nlp.process.*;
+// import java.org.tartarus.snowball.*;
+// import java.org.tartarus.snowball.ext.englishStemmer;
 public class DataCleaning {
-	List<Map.Entry<String,Integer>> pairList;
+	Map<String, Integer> pairList;
+	Queue<String> window;
+	int windowSize;
+	int freq_threshold;
 	    
-	// public String[] documents = new String[24];
-    public DataCleaning() throws Exception{
+    public DataCleaning(int windowSize, int freq_threshold) throws Exception{
+    	
+    	pairList = new HashMap<>();
+    	window = new LinkedList<>();
+    	this.windowSize = windowSize;
+    	this.freq_threshold = freq_threshold;
+    }
+    public void clean() throws Exception{
     	 // set up the pipeline
-    	pairList = new ArrayList<>();
 	    Properties props = new Properties();
 	    props.setProperty("annotators", "tokenize, ssplit, pos, lemma, ner");
 	    StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
@@ -26,7 +36,7 @@ public class DataCleaning {
 	    String[] files_out = {"article01out.txt", "article02out.txt", "article03out.txt", "article04out.txt", "article05out.txt", "article06out.txt", "article07out.txt", "article08out.txt"};
 
 	    
-	    // documents = new String[24];
+	   
 	    for (int i = 0; i < inputFileName.length; i++){
 	      for (int j = 0; j < files.length; j++){
 	        String file_path = inputFileName[i] + files[j];
@@ -54,13 +64,6 @@ public class DataCleaning {
 	          // create a new list to store the filtered tokens
 	          List<String> filteredTokens = new ArrayList<String>();
 	          
-	      	  String pretoken = "";
-	      	  String compounds = "";
-
-	          // set up the stemmer
-	          // Stemmer stemmer = new Stemmer();
-
-
 
 	          // iterate over the tokens and remove stop words
 	          for (CoreLabel token : tokens) {
@@ -70,6 +73,7 @@ public class DataCleaning {
 	            String ne = token.get(CoreAnnotations.NamedEntityTagAnnotation.class);
 
 	            // check if the word is a stop word
+
 	            boolean isStopWord = false;
 	            boolean isNamedEntity = false;
 	            for (String stopWord : stopWords) {
@@ -81,6 +85,7 @@ public class DataCleaning {
 	            if (!ne.equals("O")) {
 	              isNamedEntity = true;
 	            }
+	            // stemmer.setCurrent(word);
 
 	            // add the word to the filtered tokens list if it's not a stop word or named entity
 	            if (!isStopWord && !isNamedEntity) {
@@ -88,26 +93,14 @@ public class DataCleaning {
 	              
 		            String t = lemma.toLowerCase();
 		            filteredTokens.add(t);
-		            if (pretoken == ""){
-		            	pretoken = t;
-		            }
-		            else{
-		            	compounds = pretoken + "_" + t;
-		            	int indx = find_compound_index(compounds);
-		            	if (indx == -1){
-		            		Map.Entry<String,Integer> pair = new AbstractMap.SimpleEntry<>(compounds,1);
-		            		pairList.add(pair);
-		            		// System.out.println(pairList.get(pairList.size() - 1).getValue());
-		            		// System.out.println(compounds);
-		            	}
-		            	else{
-		            		// System.out.println("Thaaaaaaaat");
-		            		int val = pairList.get(indx).getValue();
-		            		pairList.get(indx).setValue(val + 1);
-
-		            	}
-		            	pretoken = t;
-		            }
+					window.add(t);
+                    if (window.size() > windowSize) {
+                        window.remove();
+                    }
+                    if (window.size() == windowSize) {
+                        String phrase = String.join("_", window);
+                        pairList.put(phrase, pairList.getOrDefault(phrase, 0) + 1);
+                    }
 		        }
 
 	          }
@@ -118,21 +111,21 @@ public class DataCleaning {
 	          writer.write(outputLine);
 	          writer.newLine();
 	        }
-	        // documents[i + j] += " ";
 	        // close the input and output files
 	        reader.close();
 	        writer.close();
 	      }
-	      //2-grams merge with frequency >= 5
-	      merge_words(5);
+	      window.clear();
+	      pairList.entrySet().removeIf(entry -> entry.getValue() <= freq_threshold);
+	      merge_words();
 
 	  }
 
     // print a message indicating success
     System.out.println("Data preprocessed");
     }
-
-    public static String[] stop_words(String fileName) throws IOException{
+    //reads the stopword file into an array of string
+    public String[] stop_words(String fileName) throws IOException{
         String content = "";
 
         BufferedReader br = new BufferedReader(new FileReader(fileName));
@@ -148,40 +141,13 @@ public class DataCleaning {
         // }
         return stopwords;
     }
-    public static boolean check_frequency(String word, List<Map.Entry<String,Integer>> ls, int target_freq){
-    	for (int i = 0; i < ls.size(); i++){
-    		String key = ls.get(i).getKey();
-    		if (key == word){
-    			int val = ls.get(i).getValue();
-    			if (val < target_freq){
-    				return false;
-    			}
-    		}
-    	}
-    	return true;
-    }
-    public int find_compound_index(String word){
-		for (int i = 0; i < pairList.size(); i++){
-			String key = pairList.get(i).getKey();
-			// System.out.println(key);
-			if (key.equals(word)){
-				return i;
-			}
-		}
-		return -1;
-    }
-    public void merge_words(int freq_threshold) throws Exception{
-    	// System.out.println("Thiiiiiiis");
+    public void merge_words() throws Exception{
     	String[] outputFileName = {"./dataset_3/data/C1_out/", "./dataset_3/data/C4_out/", "./dataset_3/data/C7_out/"};
     	String[] files_out = {"article01out.txt", "article02out.txt", "article03out.txt", "article04out.txt", "article05out.txt", "article06out.txt", "article07out.txt", "article08out.txt"};
 
-	    String[] files_out_2 = {"article01out1.txt", "article02out1.txt", "article03out1.txt", "article04out1.txt", "article05out1.txt", "article06out1.txt", "article07out1.txt", "article08out1.txt"};
-	    Properties props = new Properties();
-	    props.setProperty("annotators", "tokenize");
-	    StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
-
+	    String[] files_out_2 = {"article01out_2grams.txt", "article02out_2grams.txt", "article03out_2grams.txt", "article04out_2grams.txt", "article05out_2grams.txt", "article06out_2grams.txt", "article07out_2grams.txt", "article08out_2grams.txt"};
+	    boolean flag = false;
 	    
-	    // documents = new String[24];
 	    for (int i = 0; i < outputFileName.length; i++){
 	      for (int j = 0; j < files_out.length; j++){
 	        String file_path = outputFileName[i] + files_out[j];
@@ -197,42 +163,43 @@ public class DataCleaning {
 
 	        String line;
 	        while ((line = reader.readLine()) != null) {
-	          // create an Annotation object with the given text
-	          Annotation document = new Annotation(line);
-
-	          // run the pipeline on the document
-	          pipeline.annotate(document);
-
-	          // get the list of CoreLabels from the document
-	          List<CoreLabel> tokens = document.get(CoreAnnotations.TokensAnnotation.class);
-
-	          // create a new list to store the filtered tokens
+	          String[] words = line.split(" ");
 	          List<String> filteredTokens = new ArrayList<String>();
 	          
-	      	  String pretoken = "";
-	      	  String compounds = "";
+	          for (String word : words) {
+	          	// String word = token.get(CoreAnnotations.TextAnnotation.class);
+	          	window.add(word);
+                if (window.size() > windowSize) {
+                    window.remove();
+                }
+                if (window.size() == windowSize) {
 
-	          // set up the stemmer
-	          // Stemmer stemmer = new Stemmer();
+                	String phrase = String.join("_", window);
+                	// System.out.println(phrase);
+                	if(pairList.containsKey(phrase)){
+                		int count = 1;
+                		
+                		// System.out.println("token: " + word);
+                		while(count < windowSize && filteredTokens.size() != 0){
+                			filteredTokens.remove(filteredTokens.size() - 1);
+                			count++;
+                		}
+                		// System.out.println("here");
+                		flag = true;
+                		filteredTokens.add(phrase);
+                	}
+                	else{
+                		filteredTokens.add(word);
+                	}
+                }
 
-
-
-	          // iterate over the tokens and remove stop words
-	          for (CoreLabel token : tokens) {
-	          	String word = token.get(CoreAnnotations.TextAnnotation.class);
-          		String compound = pretoken + "_" + word;
-          		int index = find_compound_index(compound);
-          		if ( index != -1 && pairList.get(index).getValue() >= freq_threshold){
-          			// System.out.println("Thiiiiiiis");
-          			pretoken = word;
-          			word = compound;
-          			filteredTokens.remove(filteredTokens.size() - 1);
-          		}
           		else{
-          			pretoken = word;
-          		}
-          		
-          		filteredTokens.add(word);
+          			if (flag ){
+          				System.out.println("there");
+          				flag = false;
+          			}
+          			filteredTokens.add(word);
+          		}          		
 	          	
 	          }
 	          String outputLine = String.join(" ", filteredTokens);
@@ -240,8 +207,6 @@ public class DataCleaning {
 	          writer.write(outputLine);
 	          writer.newLine();
 	        }
-	        // documents[i + j] += " ";
-	        // close the input and output files
 	        reader.close();
           	writer.close();
 	      }

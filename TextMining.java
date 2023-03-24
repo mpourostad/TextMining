@@ -270,7 +270,6 @@ public class TextMining{
 	        System.err.println("Error writing to file: " + ex.getMessage());
 	    }
 	}
-	crea
 	public static int[] generate_labels(double[][] data, int[][] keywords, int num_classes){
 		//building a 1d array from n top topics of each folder. 
 

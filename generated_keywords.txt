@@ -1,0 +1,12 @@
+the best topics describing folder 1 are:
+police_force
+pilot
+airline
+the best topics describing folder 2 are:
+meat
+animal
+veterinary
+the best topics describing folder 3 are:
+bank
+rate
+mortgage

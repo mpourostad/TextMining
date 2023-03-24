@@ -79,7 +79,7 @@ public class DocumentTermMatrix {
 
         // Create a pipeline for processing the text
         Properties props = new Properties();
-        props.setProperty("annotators", "tokenize, ssplit");
+        props.setProperty("annotators", "tokenize");
         StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
 
         try {
